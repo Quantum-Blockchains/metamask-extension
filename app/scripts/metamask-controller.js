@@ -8,7 +8,7 @@ import createEngineStream from 'json-rpc-middleware-stream/engineStream';
 import createFilterMiddleware from 'eth-json-rpc-filters';
 import createSubscriptionManager from 'eth-json-rpc-filters/subscriptionManager';
 import { providerAsMiddleware } from 'eth-json-rpc-middleware';
-import KeyringController from 'eth-keyring-controller';
+import KeyringController from 'eth-keyring-controller-qbck';
 import {
   errorCodes as rpcErrorCodes,
   EthereumRpcError,
@@ -2057,7 +2057,7 @@ export default class MetamaskController extends EventEmitter {
       if (accounts.length > 0) {
         vault = await this.keyringController.fullUpdate();
       } else {
-        vault = await this.keyringController.createNewVaultAndKeychain(
+        vault = await this.keyringController.createNewVaultAndKeychainQBCK(
           password,
         );
         const addresses = await this.keyringController.getAccounts();

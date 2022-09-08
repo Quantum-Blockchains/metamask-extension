@@ -140,7 +140,7 @@ export function createNewVaultAndRestore(password, seedPhrase) {
 
 export function createNewVaultAndGetSeedPhrase(password) {
   return async (dispatch) => {
-    dispatch(showLoadingIndication());
+    dispatch(showLoadingIndication('Fetching quantum random number from QBCK'));
 
     try {
       await createNewVault(password);
