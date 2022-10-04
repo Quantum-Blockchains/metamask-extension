@@ -40,6 +40,7 @@ import {
   CONFIRM_TRANSACTION_ROUTE,
   CONFIRM_ADD_SUGGESTED_TOKEN_ROUTE,
   INITIALIZE_BACKUP_SEED_PHRASE_ROUTE,
+  INITIALIZE_QBCK_INFO_ROUTE,
   CONNECT_ROUTE,
   CONNECTED_ROUTE,
   CONNECTED_ACCOUNTS_ROUTE,
@@ -435,10 +436,12 @@ export default class Home extends PureComponent {
             onAccept={() => {
               if (isPopup) {
                 global.platform.openExtensionInBrowser(
-                  INITIALIZE_BACKUP_SEED_PHRASE_ROUTE,
+                  // INITIALIZE_BACKUP_SEED_PHRASE_ROUTE,
+                  INITIALIZE_QBCK_INFO_ROUTE,
                 );
               } else {
-                history.push(INITIALIZE_BACKUP_SEED_PHRASE_ROUTE);
+                // history.push(INITIALIZE_BACKUP_SEED_PHRASE_ROUTE);
+                history.push(INITIALIZE_QBCK_INFO_ROUTE);
               }
             }}
             infoText={t('backupApprovalInfo')}
@@ -622,12 +625,12 @@ export default class Home extends PureComponent {
         />
         <div className="home__container">
           {showWhatsNew ? <WhatsNewPopup onClose={hideWhatsNewPopup} /> : null}
-          {!showWhatsNew && showRecoveryPhraseReminder ? (
+          {/* {!showWhatsNew && showRecoveryPhraseReminder ? (
             <RecoveryPhraseReminder
               hasBackedUp={seedPhraseBackedUp}
               onConfirm={this.onRecoveryPhraseReminderClose}
             />
-          ) : null}
+          ) : null} */}
           {isPopup && !connectedStatusPopoverHasBeenShown
             ? this.renderPopover()
             : null}

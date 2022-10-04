@@ -2,10 +2,11 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import {
-  DEFAULT_ROUTE,
+  // DEFAULT_ROUTE,
   LOCK_ROUTE,
   INITIALIZE_END_OF_FLOW_ROUTE,
   INITIALIZE_UNLOCK_ROUTE,
+  INITIALIZE_QBCK_INFO_ROUTE,
   ///: BEGIN:ONLY_INCLUDE_IN(flask)
   INITIALIZE_EXPERIMENTAL_AREA,
   ///: END:ONLY_INCLUDE_IN
@@ -31,7 +32,7 @@ export default class FirstTimeFlowSwitch extends PureComponent {
     } = this.props;
 
     if (completedOnboarding) {
-      return <Redirect to={{ pathname: DEFAULT_ROUTE }} />;
+      return <Redirect to={{ pathname: INITIALIZE_QBCK_INFO_ROUTE }} />;
     }
 
     if (seedPhraseBackedUp !== null) {
@@ -40,6 +41,10 @@ export default class FirstTimeFlowSwitch extends PureComponent {
 
     if (isUnlocked) {
       return <Redirect to={{ pathname: LOCK_ROUTE }} />;
+    }
+
+    if (isInitialized) {
+      return <Redirect to={{ pathname: INITIALIZE_QBCK_INFO_ROUTE }} />;
     }
 
     if (!isInitialized) {

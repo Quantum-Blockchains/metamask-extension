@@ -474,7 +474,8 @@
       "eth-lattice-keyring>gridplus-sdk>secp256k1": false,
       "eth-lattice-keyring>secp256k1": false,
       "@storybook/react>@pmmmwh/react-refresh-webpack-plugin>core-js-pure": false,
-      "@testing-library/jest-dom>aria-query>@babel/runtime-corejs3>core-js-pure": false
+      "@testing-library/jest-dom>aria-query>@babel/runtime-corejs3>core-js-pure": false,
+      "eth-keyring-controller-qbck": true
     }
   }
 }

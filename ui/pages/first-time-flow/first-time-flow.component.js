@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
 import Unlock from '../unlock-page';
 import {
-  DEFAULT_ROUTE,
+  // DEFAULT_ROUTE,
   INITIALIZE_WELCOME_ROUTE,
   INITIALIZE_CREATE_PASSWORD_ROUTE,
+  INITIALIZE_QBCK_INFO_ROUTE,
   INITIALIZE_SEED_PHRASE_ROUTE,
   INITIALIZE_UNLOCK_ROUTE,
   INITIALIZE_SELECT_ACTION_ROUTE,
@@ -25,6 +26,7 @@ import Welcome from './welcome';
 import SelectAction from './select-action';
 import EndOfFlow from './end-of-flow';
 import CreatePassword from './create-password';
+import QBCKInfo from './qbck-info/qbck-info.component';
 import SeedPhrase from './seed-phrase';
 import MetaMetricsOptInScreen from './metametrics-opt-in';
 
@@ -49,21 +51,25 @@ export default class FirstTimeFlow extends PureComponent {
 
   componentDidMount() {
     const {
-      completedOnboarding,
+      // completedOnboarding,
       history,
       isInitialized,
       isUnlocked,
-      showingSeedPhraseBackupAfterOnboarding,
-      seedPhraseBackedUp,
+      // showingSeedPhraseBackupAfterOnboarding,
+      // seedPhraseBackedUp,
     } = this.props;
 
-    if (
-      completedOnboarding &&
-      (!showingSeedPhraseBackupAfterOnboarding || seedPhraseBackedUp)
-    ) {
-      history.push(DEFAULT_ROUTE);
-      return;
+    if (isInitialized && isUnlocked) {
+      history.push(INITIALIZE_QBCK_INFO_ROUTE);
     }
+
+    // if (
+    //   completedOnboarding &&
+    //   (!showingSeedPhraseBackupAfterOnboarding || seedPhraseBackedUp)
+    // ) {
+    //   history.push(DEFAULT_ROUTE);
+    //   return;
+    // }
 
     if (isInitialized && !isUnlocked) {
       history.push(INITIALIZE_UNLOCK_ROUTE);
@@ -112,6 +118,10 @@ export default class FirstTimeFlow extends PureComponent {
     return (
       <div className="first-time-flow">
         <Switch>
+          <Route
+            path={INITIALIZE_QBCK_INFO_ROUTE}
+            component={QBCKInfo}
+          />
           <Route
             path={INITIALIZE_SEED_PHRASE_ROUTE}
             render={(routeProps) => (

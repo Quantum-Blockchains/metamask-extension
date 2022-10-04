@@ -19,7 +19,8 @@ const mapStateToProps = (state, ownProps) => {
     },
   } = state;
   const showingSeedPhraseBackupAfterOnboarding = Boolean(
-    ownProps.location.pathname.match(INITIALIZE_BACKUP_SEED_PHRASE_ROUTE),
+    // ownProps.location.pathname.match(INITIALIZE_BACKUP_SEED_PHRASE_ROUTE),
+    false
   );
 
   return {
