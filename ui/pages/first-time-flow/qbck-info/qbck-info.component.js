@@ -3,9 +3,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import Mascot from '../../../components/ui/mascot';
 import Button from '../../../components/ui/button';
-import {
-  INITIALIZE_SEED_PHRASE_INTRO_ROUTE,
-} from '../../../helpers/constants/routes';
+import { INITIALIZE_SEED_PHRASE_INTRO_ROUTE } from '../../../helpers/constants/routes';
 import { isBeta } from '../../../helpers/utils/build-types';
 import WelcomeFooter from './welcome-footer.component';
 import BetaWelcomeFooter from './beta-welcome-footer.component';
@@ -26,16 +24,15 @@ export default class QBCKInfo extends PureComponent {
   }
 
   componentDidMount() {
-    const { history, isInitialized } = this.props;
-
-    alert("QBCK info page");
+    alert('QBCK info page');
   }
 
   render() {
-    const openInNewTab = url => {
+    const openInNewTab = (url) => {
       window.open(url, '_blank', 'noopener,noreferrer');
     };
     const { t } = this.context;
+    const { history } = this.props;
 
     return (
       <div className="welcome-page__wrapper">
@@ -59,7 +56,11 @@ export default class QBCKInfo extends PureComponent {
           <Button
             type="primary"
             className="first-time-flow__button"
-            onClick={() => openInNewTab('https://www.quantumblockchains.io/current-services/api/')}
+            onClick={() =>
+              openInNewTab(
+                'https://www.quantumblockchains.io/quantum-cryptography-qrng-qkd/qrng-api/',
+              )
+            }
           >
             {t('findOutMore')}
           </Button>
