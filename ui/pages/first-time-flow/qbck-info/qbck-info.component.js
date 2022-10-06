@@ -1,12 +1,9 @@
 import EventEmitter from 'events';
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import Mascot from '../../../components/ui/mascot';
 import Button from '../../../components/ui/button';
 import { INITIALIZE_SEED_PHRASE_INTRO_ROUTE } from '../../../helpers/constants/routes';
-import { isBeta } from '../../../helpers/utils/build-types';
-import WelcomeFooter from './welcome-footer.component';
-import BetaWelcomeFooter from './beta-welcome-footer.component';
+import MetaFoxLogo from '../../../components/ui/metafox-logo';
 
 export default class QBCKInfo extends PureComponent {
   static propTypes = {
@@ -23,10 +20,6 @@ export default class QBCKInfo extends PureComponent {
     this.animationEventEmitter = new EventEmitter();
   }
 
-  componentDidMount() {
-    alert('QBCK info page');
-  }
-
   render() {
     const openInNewTab = (url) => {
       window.open(url, '_blank', 'noopener,noreferrer');
@@ -35,34 +28,50 @@ export default class QBCKInfo extends PureComponent {
     const { history } = this.props;
 
     return (
-      <div className="welcome-page__wrapper">
-        <div className="welcome-page">
-          <Mascot
-            animationEventEmitter={this.animationEventEmitter}
-            width="125"
-            height="125"
-          />
-          {isBeta() ? <BetaWelcomeFooter /> : <WelcomeFooter />}
+      <div className="qbck-page__wrapper">
+        <div className="app-header">
+          <div className="app-header__contents">
+            <MetaFoxLogo />
+          </div>
+        </div>
+        <div className="qbck-page">
+          <a href="https://www.quantumblockchains.io/" target="_blank">
+            <img
+              src="images/qbck-logo.svg"
+              className="qbck-page__logo"
+              alt=""
+            />
+          </a>
+          <div className="qbck-page__content-item">
+            <h2>{t('qbckPageTitle')}</h2>
+            <p className="qbck-page__content-description">
+              {t('qbckPageDescription')}
+            </p>
+          </div>
+          <div className="qbck-page__content-item">
+            <div className="qbck-page__content-item-col">
+              <Button
+                type="secondary"
+                className="qbck-page__button"
+                onClick={() =>
+                  openInNewTab(
+                    'https://www.quantumblockchains.io/quantum-cryptography-qrng-qkd/qrng-api/',
+                  )
+                }
+              >
+                {t('findOutMore')}
+              </Button>              
+            </div>
+          </div>
           <Button
             type="primary"
-            className="first-time-flow__button"
+            className="qbck-page__button"
             onClick={(e) => {
               e.preventDefault();
               history.push(INITIALIZE_SEED_PHRASE_INTRO_ROUTE);
             }}
           >
             {t('continue')}
-          </Button>
-          <Button
-            type="primary"
-            className="first-time-flow__button"
-            onClick={() =>
-              openInNewTab(
-                'https://www.quantumblockchains.io/quantum-cryptography-qrng-qkd/qrng-api/',
-              )
-            }
-          >
-            {t('findOutMore')}
           </Button>
         </div>
       </div>

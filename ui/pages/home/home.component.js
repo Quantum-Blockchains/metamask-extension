@@ -24,7 +24,6 @@ import ConnectedAccounts from '../connected-accounts';
 import { Tabs, Tab } from '../../components/ui/tabs';
 import { EthOverview } from '../../components/app/wallet-overview';
 import WhatsNewPopup from '../../components/app/whats-new-popup';
-import RecoveryPhraseReminder from '../../components/app/recovery-phrase-reminder';
 import ActionableMessage from '../../components/ui/actionable-message/actionable-message';
 import Typography from '../../components/ui/typography/typography';
 import {
@@ -39,7 +38,6 @@ import {
   RESTORE_VAULT_ROUTE,
   CONFIRM_TRANSACTION_ROUTE,
   CONFIRM_ADD_SUGGESTED_TOKEN_ROUTE,
-  INITIALIZE_BACKUP_SEED_PHRASE_ROUTE,
   INITIALIZE_QBCK_INFO_ROUTE,
   CONNECT_ROUTE,
   CONNECTED_ROUTE,
@@ -122,19 +120,8 @@ export default class Home extends PureComponent {
     shouldShowErrors: PropTypes.bool.isRequired,
     removeSnapError: PropTypes.func.isRequired,
     ///: END:ONLY_INCLUDE_IN
-    showRecoveryPhraseReminder: PropTypes.bool.isRequired,
     setRecoveryPhraseReminderHasBeenShown: PropTypes.func.isRequired,
     setRecoveryPhraseReminderLastShown: PropTypes.func.isRequired,
-    seedPhraseBackedUp: (props) => {
-      if (
-        props.seedPhraseBackedUp !== null &&
-        typeof props.seedPhraseBackedUp !== 'boolean'
-      ) {
-        throw new Error(
-          `seedPhraseBackedUp is required to be null or boolean. Received ${props.seedPhraseBackedUp}`,
-        );
-      }
-    },
     newNetworkAdded: PropTypes.string,
     setNewNetworkAdded: PropTypes.func.isRequired,
     // This prop is used in the `shouldCloseNotificationPopup` function
@@ -436,11 +423,9 @@ export default class Home extends PureComponent {
             onAccept={() => {
               if (isPopup) {
                 global.platform.openExtensionInBrowser(
-                  // INITIALIZE_BACKUP_SEED_PHRASE_ROUTE,
                   INITIALIZE_QBCK_INFO_ROUTE,
                 );
               } else {
-                // history.push(INITIALIZE_BACKUP_SEED_PHRASE_ROUTE);
                 history.push(INITIALIZE_QBCK_INFO_ROUTE);
               }
             }}
@@ -597,8 +582,6 @@ export default class Home extends PureComponent {
       announcementsToShow,
       showWhatsNewPopup,
       hideWhatsNewPopup,
-      seedPhraseBackedUp,
-      showRecoveryPhraseReminder,
       firstTimeFlowType,
       completedOnboarding,
     } = this.props;
@@ -625,12 +608,6 @@ export default class Home extends PureComponent {
         />
         <div className="home__container">
           {showWhatsNew ? <WhatsNewPopup onClose={hideWhatsNewPopup} /> : null}
-          {/* {!showWhatsNew && showRecoveryPhraseReminder ? (
-            <RecoveryPhraseReminder
-              hasBackedUp={seedPhraseBackedUp}
-              onConfirm={this.onRecoveryPhraseReminderClose}
-            />
-          ) : null} */}
           {isPopup && !connectedStatusPopoverHasBeenShown
             ? this.renderPopover()
             : null}

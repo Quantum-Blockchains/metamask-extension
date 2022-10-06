@@ -2697,6 +2697,12 @@
   "publicAddress": {
     "message": "Public address"
   },
+  "qbckPageDescription": {
+    "message": "The entropy obtained from our Quantum Random Number Generator is mixed with the local entropy using a bit-wise XOR, so the final entropy remains only on your local machine."
+  },
+  "qbckPageTitle": {
+    "message": "Thank you for using our modification of the Metamask extension!"
+  },
   "queue": {
     "message": "Queue"
   },
