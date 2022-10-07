@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Switch, Route } from 'react-router-dom';
 import Unlock from '../unlock-page';
 import {
-  // DEFAULT_ROUTE,
+  DEFAULT_ROUTE,
   INITIALIZE_WELCOME_ROUTE,
   INITIALIZE_CREATE_PASSWORD_ROUTE,
   INITIALIZE_QBCK_INFO_ROUTE,
@@ -51,25 +51,21 @@ export default class FirstTimeFlow extends PureComponent {
 
   componentDidMount() {
     const {
-      // completedOnboarding,
+      completedOnboarding,
       history,
       isInitialized,
       isUnlocked,
-      // showingSeedPhraseBackupAfterOnboarding,
-      // seedPhraseBackedUp,
+      showingSeedPhraseBackupAfterOnboarding,
+      seedPhraseBackedUp,
     } = this.props;
 
-    if (isInitialized && isUnlocked) {
-      history.push(INITIALIZE_QBCK_INFO_ROUTE);
+    if (
+      completedOnboarding &&
+      (!showingSeedPhraseBackupAfterOnboarding || seedPhraseBackedUp)
+    ) {
+      history.push(DEFAULT_ROUTE);
+      return;
     }
-
-    // if (
-    //   completedOnboarding &&
-    //   (!showingSeedPhraseBackupAfterOnboarding || seedPhraseBackedUp)
-    // ) {
-    //   history.push(DEFAULT_ROUTE);
-    //   return;
-    // }
 
     if (isInitialized && !isUnlocked) {
       history.push(INITIALIZE_UNLOCK_ROUTE);
