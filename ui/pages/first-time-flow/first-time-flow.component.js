@@ -73,11 +73,12 @@ export default class FirstTimeFlow extends PureComponent {
   }
 
   handleCreateNewAccount = async (password) => {
-    const { createNewAccount } = this.props;
+    const { createNewAccount, unlockAccount } = this.props;
 
     try {
       const seedPhrase = await createNewAccount(password);
       this.setState({ seedPhrase });
+      await unlockAccount(password);
     } catch (error) {
       throw new Error(error.message);
     }
