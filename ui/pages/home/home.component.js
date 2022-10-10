@@ -597,8 +597,6 @@ export default class Home extends PureComponent {
       showPortfolioTooltip,
       hidePortfolioTooltip,
       portfolioTooltipWasShownInThisSession,
-      seedPhraseBackedUp,
-      showRecoveryPhraseReminder,
       firstTimeFlowType,
       completedOnboarding,
       shouldShowSeedPhraseReminder,
