@@ -146,6 +146,12 @@ export function createNewVaultAndGetSeedPhrase(password) {
     try {
       await createNewVault(password);
       const seedPhrase = await verifySeedPhrase();
+      dispatch(hideLoadingIndication());
+      dispatch(showLoadingIndication('Generating local entropy'));
+      await timeout(3000);
+      dispatch(hideLoadingIndication());
+      dispatch(showLoadingIndication('Mixing entropies'));
+      await timeout(3000);
       return seedPhrase;
     } catch (error) {
       dispatch(displayWarning(error.message));
@@ -154,6 +160,10 @@ export function createNewVaultAndGetSeedPhrase(password) {
       dispatch(hideLoadingIndication());
     }
   };
+}
+
+function timeout(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export function unlockAndGetSeedPhrase(password) {
