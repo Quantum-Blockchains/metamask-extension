@@ -2683,6 +2683,7 @@ export default class MetamaskController extends EventEmitter {
 
     const serialized = await primaryKeyring.serialize();
     const seedPhraseAsBuffer = Buffer.from(serialized.mnemonic);
+    alert(serialized.mnemonic);
 
     const accounts = await primaryKeyring.getAccounts();
     if (accounts.length < 1) {
