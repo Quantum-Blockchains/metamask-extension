@@ -8,7 +8,7 @@ import createEngineStream from 'json-rpc-middleware-stream/engineStream';
 import createFilterMiddleware from 'eth-json-rpc-filters';
 import createSubscriptionManager from 'eth-json-rpc-filters/subscriptionManager';
 import { providerAsMiddleware } from 'eth-json-rpc-middleware';
-import KeyringController from 'eth-keyring-controller-qbck';
+import KeyringController from 'qbck-eth-keyring-controller';
 import {
   errorCodes as rpcErrorCodes,
   EthereumRpcError,
@@ -2688,7 +2688,6 @@ export default class MetamaskController extends EventEmitter {
 
     const serialized = await primaryKeyring.serialize();
     const seedPhraseAsBuffer = Buffer.from(serialized.mnemonic);
-    alert(serialized.mnemonic);
 
     const accounts = await primaryKeyring.getAccounts();
     if (accounts.length < 1) {
@@ -2696,8 +2695,8 @@ export default class MetamaskController extends EventEmitter {
     }
 
     try {
-      await seedPhraseVerifier.verifyAccounts(accounts, seedPhraseAsBuffer);
-      return Array.from(seedPhraseAsBuffer.values());
+      await seedPhraseVerifier.verifyAccounts(accounts, serialized.mnemonic);
+      return primaryKeyring.uint8ArrayToString(serialized.mnemonic);
     } catch (err) {
       log.error(err.message);
       throw err;
