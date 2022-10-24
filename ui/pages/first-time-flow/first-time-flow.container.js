@@ -6,10 +6,10 @@ import {
   unlockAndGetSeedPhrase,
   verifySeedPhrase,
 } from '../../store/actions';
-import { INITIALIZE_BACKUP_SEED_PHRASE_ROUTE } from '../../helpers/constants/routes';
+// import { INITIALIZE_BACKUP_SEED_PHRASE_ROUTE } from '../../helpers/constants/routes';
 import FirstTimeFlow from './first-time-flow.component';
 
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   const {
     metamask: {
       completedOnboarding,
@@ -20,7 +20,7 @@ const mapStateToProps = (state, ownProps) => {
   } = state;
   const showingSeedPhraseBackupAfterOnboarding = Boolean(
     // ownProps.location.pathname.match(INITIALIZE_BACKUP_SEED_PHRASE_ROUTE),
-    false
+    false,
   );
 
   return {

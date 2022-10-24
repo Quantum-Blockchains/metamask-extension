@@ -1354,12 +1354,12 @@
     "message": "Fiat",
     "description": "Exchange type"
   },
-  "findOutMore": {
-    "message": "Find out more"
-  },
   "fileImportFail": {
     "message": "File import not working? Click here!",
     "description": "Helps user import their account from a JSON file"
+  },
+  "findOutMore": {
+    "message": "Find out more"
   },
   "flaskSnapSettingsCardButtonCta": {
     "message": "See details",

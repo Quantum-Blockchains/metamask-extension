@@ -163,7 +163,7 @@ export function createNewVaultAndGetSeedPhrase(password) {
 }
 
 function timeout(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export function unlockAndGetSeedPhrase(password) {
