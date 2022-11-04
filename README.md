@@ -12,6 +12,10 @@ To learn how to develop MetaMask-compatible applications, visit our [Developer D
 
 To learn how to contribute to the MetaMask project itself, visit our [Internal Docs](https://github.com/MetaMask/metamask-extension/tree/develop/docs).
 
+## Quantum Blockchains modification
+
+The Metamask extension was modified by our team to make use of our quantum random number generator API (https://www.quantumblockchains.io/quantum-cryptography-qrng-qkd/qrng-api/). The fetched entropy is XORed with a locally generated entropy, which ensures that the final entropy cannot be recreated to the fetched one, as well as not diminishing the final entropy's randomness.
+
 ## Building locally
 
 - Install [Node.js](https://nodejs.org) version 16

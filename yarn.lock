@@ -7294,6 +7294,18 @@ bindings@^1.3.0, bindings@^1.5.0:
   dependencies:
     file-uri-to-path "1.0.0"
 
+bip39-qbck@^3.1.2:
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/bip39-qbck/-/bip39-qbck-3.1.2.tgz#59629ffc80f1eb0267bd4b38ebd39a94df447907"
+  integrity sha512-7/+Zg9jlw9KW3RMkd7YbbtlDkCgS92eKfmwMTJrIx1RpS1QWpGM8k2fnFXCx9r8qxIkwRfg9MDdaWPvR4yXmYA==
+  dependencies:
+    "@types/node" "11.11.6"
+    axios "^0.27.2"
+    create-hash "^1.1.0"
+    pbkdf2 "^3.0.9"
+    random-binary "^1.0.3"
+    randombytes "^2.0.1"
+
 bip66@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/bip66/-/bip66-1.1.5.tgz#01fa8748785ca70955d5011217d1b3139969ca22"
@@ -8434,6 +8446,11 @@ cjs-module-lexer@^1.0.0:
   version "1.2.2"
   resolved "https://registry.yarnpkg.com/cjs-module-lexer/-/cjs-module-lexer-1.2.2.tgz#9f84ba3244a512f3a54e5277e8eef4c489864e40"
   integrity sha512-cOU9usZw8/dXIXKtwa8pM0OTJQuJkxMN6w30csNRUerHfeQ5R6U3kkU/FtJeIf3M202OHfY2U8ccInBG7/xogA==
+
+clamp@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/clamp/-/clamp-1.0.1.tgz#66a0e64011816e37196828fdc8c8c147312c8634"
+  integrity sha512-kgMuFyE78OC6Dyu3Dy7vcx4uy97EIbVxJB/B0eJ3bUNAkwdNcxYzgKltnyADiYwsR7SEqkkUPsEUT//OVS6XMA==
 
 class-utils@^0.3.5:
   version "0.3.6"
