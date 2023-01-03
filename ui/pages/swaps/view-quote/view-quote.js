@@ -11,6 +11,7 @@ import { useHistory } from 'react-router-dom';
 import BigNumber from 'bignumber.js';
 import { isEqual } from 'lodash';
 import classnames from 'classnames';
+import { captureException } from '@sentry/browser';
 
 import { I18nContext } from '../../../contexts/i18n';
 import SelectQuotePopover from '../select-quote-popover';
@@ -63,9 +64,9 @@ import {
   getHardwareWalletType,
   checkNetworkAndAccountSupports1559,
   getUSDConversionRate,
+  getIsMultiLayerFeeNetwork,
 } from '../../../selectors';
 import { getNativeCurrency, getTokens } from '../../../ducks/metamask/metamask';
-
 import {
   safeRefetchQuotes,
   setCustomApproveTxData,
@@ -112,7 +113,10 @@ import {
   hexWEIToDecGWEI,
   toPrecisionWithoutTrailingZeros,
 } from '../../../../shared/lib/transactions-controller-utils';
+import { addHexPrefix } from '../../../../app/scripts/lib/util';
 import { calcTokenValue } from '../../../../shared/lib/swaps-utils';
+import fetchEstimatedL1Fee from '../../../helpers/utils/optimism/fetchEstimatedL1Fee';
+import { sumHexes } from '../../../helpers/utils/transactions.util';
 import ViewQuotePriceDifference from './view-quote-price-difference';
 
 let intervalId;
@@ -128,6 +132,7 @@ export default function ViewQuote() {
   const [selectQuotePopoverShown, setSelectQuotePopoverShown] = useState(false);
   const [warningHidden, setWarningHidden] = useState(false);
   const [originalApproveAmount, setOriginalApproveAmount] = useState(null);
+  const [multiLayerL1FeeTotal, setMultiLayerL1FeeTotal] = useState(null);
   // We need to have currentTimestamp in state, otherwise it would change with each rerender.
   const [currentTimestamp] = useState(Date.now());
 
@@ -161,6 +166,7 @@ export default function ViewQuote() {
   const { balance: ethBalance } = useSelector(getSelectedAccount, shallowEqual);
   const conversionRate = useSelector(conversionRateSelector);
   const USDConversionRate = useSelector(getUSDConversionRate);
+  const isMultiLayerFeeNetwork = useSelector(getIsMultiLayerFeeNetwork);
   const currentCurrency = useSelector(getCurrentCurrency);
   const swapsTokens = useSelector(getTokens, isEqual);
   const networkAndAccountSupports1559 = useSelector(
@@ -261,8 +267,13 @@ export default function ViewQuote() {
       maxPriorityFeePerGas,
     );
   }
-
-  const gasTotalInWeiHex = calcGasTotal(maxGasLimit, maxFeePerGas || gasPrice);
+  let gasTotalInWeiHex = calcGasTotal(maxGasLimit, maxFeePerGas || gasPrice);
+  if (multiLayerL1FeeTotal !== null) {
+    gasTotalInWeiHex = sumHexes(
+      gasTotalInWeiHex || '0x0',
+      multiLayerL1FeeTotal || '0x0',
+    );
+  }
 
   const { tokensWithBalances } = useTokenTracker(swapsTokens, true);
   const balanceToken =
@@ -303,6 +314,7 @@ export default function ViewQuote() {
         smartTransactionsOptInStatus &&
         smartTransactionFees?.tradeTxFees,
       nativeCurrencySymbol,
+      multiLayerL1FeeTotal,
     );
   }, [
     quotes,
@@ -318,6 +330,7 @@ export default function ViewQuote() {
     nativeCurrencySymbol,
     smartTransactionsEnabled,
     smartTransactionsOptInStatus,
+    multiLayerL1FeeTotal,
   ]);
 
   const renderableDataForUsedQuote = renderablePopoverData.find(
@@ -351,6 +364,7 @@ export default function ViewQuote() {
       sourceAmount: usedQuote.sourceAmount,
       chainId,
       nativeCurrencySymbol,
+      multiLayerL1FeeTotal,
     });
   additionalTrackingParams.reg_tx_fee_in_usd = Number(feeInUsd);
   additionalTrackingParams.reg_tx_fee_in_eth = Number(rawEthFee);
@@ -367,6 +381,7 @@ export default function ViewQuote() {
     sourceAmount: usedQuote.sourceAmount,
     chainId,
     nativeCurrencySymbol,
+    multiLayerL1FeeTotal,
   });
   let {
     feeInFiat: maxFeeInFiat,
@@ -874,6 +889,37 @@ export default function ViewQuote() {
     currentSmartTransactionsError,
     submitClicked,
   ]);
+
+  useEffect(() => {
+    if (!isMultiLayerFeeNetwork) {
+      return;
+    }
+    const getEstimatedL1Fee = async () => {
+      try {
+        const l1TradeFeeTotal = await fetchEstimatedL1Fee(global.eth, {
+          txParams: unsignedTransaction,
+          chainId,
+        });
+        let l1ApprovalFeeTotal = '0x0';
+        if (approveTxParams) {
+          l1ApprovalFeeTotal = await fetchEstimatedL1Fee(global.eth, {
+            txParams: {
+              ...approveTxParams,
+              gasPrice: addHexPrefix(approveTxParams.gasPrice),
+              value: '0x0', // For approval txs we need to use "0x0" here.
+            },
+            chainId,
+          });
+        }
+        const l1FeeTotal = sumHexes(l1TradeFeeTotal, l1ApprovalFeeTotal);
+        setMultiLayerL1FeeTotal(l1FeeTotal);
+      } catch (e) {
+        captureException(e);
+        setMultiLayerL1FeeTotal(null);
+      }
+    };
+    getEstimatedL1Fee();
+  }, [unsignedTransaction, approveTxParams, isMultiLayerFeeNetwork, chainId]);
 
   useEffect(() => {
     if (currentSmartTransactionsEnabled && smartTransactionsOptInStatus) {

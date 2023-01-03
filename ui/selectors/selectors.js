@@ -22,8 +22,8 @@ import {
   CHAIN_IDS,
   NETWORK_TYPES,
 } from '../../shared/constants/network';
+import { KEYRING_TYPES } from '../../shared/constants/keyrings';
 import {
-  KEYRING_TYPES,
   WEBHID_CONNECTED_STATUSES,
   LEDGER_TRANSPORT_TYPES,
   TRANSPORT_STATES,
@@ -71,6 +71,7 @@ import {
 import { isEqualCaseInsensitive } from '../../shared/modules/string-utils';
 import { hexToDecimal } from '../../shared/lib/metamask-controller-utils';
 import { formatMoonpaySymbol } from '../helpers/utils/moonpay';
+import { TRANSACTION_STATUSES } from '../../shared/constants/transaction';
 ///: BEGIN:ONLY_INCLUDE_IN(flask)
 import { SNAPS_VIEW_ROUTE } from '../helpers/constants/routes';
 import { getPermissionSubjects } from './permissions';
@@ -242,7 +243,7 @@ export function getAccountType(state) {
     case KEYRING_TYPES.LEDGER:
     case KEYRING_TYPES.LATTICE:
       return 'hardware';
-    case 'Simple Key Pair':
+    case KEYRING_TYPES.IMPORTED:
       return 'imported';
     default:
       return 'default';
@@ -391,7 +392,17 @@ export function getAddressBook(state) {
 }
 
 export function getEnsResolutionByAddress(state, address) {
-  return state.metamask.ensResolutionsByAddress[address] || '';
+  if (state.metamask.ensResolutionsByAddress[address]) {
+    return state.metamask.ensResolutionsByAddress[address];
+  }
+
+  const entry =
+    getAddressBookEntry(state, address) ||
+    Object.values(state.metamask.identities).find((identity) =>
+      isEqualCaseInsensitive(identity.address, toChecksumHexAddress(address)),
+    );
+
+  return entry?.name || '';
 }
 
 export function getAddressBookEntry(state, address) {
@@ -409,6 +420,21 @@ export function getAddressBookEntryOrAccountName(state, address) {
       isEqualCaseInsensitive(identity.address, toChecksumHexAddress(address)),
     );
   return entry && entry.name !== '' ? entry.name : address;
+}
+
+export function getAccountName(identities, address) {
+  const entry = Object.values(identities).find((identity) =>
+    isEqualCaseInsensitive(identity.address, toChecksumHexAddress(address)),
+  );
+  return entry && entry.name !== '' ? entry.name : '';
+}
+
+export function getMetadataContractName(state, address) {
+  const tokenList = getTokenList(state);
+  const entry = Object.values(tokenList).find((identity) =>
+    isEqualCaseInsensitive(identity.address, toChecksumHexAddress(address)),
+  );
+  return entry && entry.name !== '' ? entry.name : '';
 }
 
 export function accountsWithSendEtherInfoSelector(state) {
@@ -507,7 +533,7 @@ export function getTotalUnapprovedMessagesCount(state) {
   );
 }
 
-function getUnapprovedTxCount(state) {
+export function getUnapprovedTxCount(state) {
   const { unapprovedTxs = {} } = state.metamask;
   return Object.keys(unapprovedTxs).length;
 }
@@ -791,6 +817,9 @@ const createDeepEqualSelector = createSelectorCreator(defaultMemoize, isEqual);
 export const getUnapprovedTransactions = (state) =>
   state.metamask.unapprovedTxs;
 
+const getCurrentNetworkTransactionList = (state) =>
+  state.metamask.currentNetworkTxList;
+
 export const getTxData = (state) => state.confirmTransaction.txData;
 
 export const getUnapprovedTransaction = createDeepEqualSelector(
@@ -803,10 +832,25 @@ export const getUnapprovedTransaction = createDeepEqualSelector(
   },
 );
 
+export const getTransaction = createDeepEqualSelector(
+  getCurrentNetworkTransactionList,
+  (_, transactionId) => transactionId,
+  (unapprovedTxs, transactionId) => {
+    return (
+      Object.values(unapprovedTxs).find(({ id }) => id === transactionId) || {}
+    );
+  },
+);
+
 export const getFullTxData = createDeepEqualSelector(
   getTxData,
-  (state, transactionId) => getUnapprovedTransaction(state, transactionId),
-  (_state, _transactionId, customTxParamsData) => customTxParamsData,
+  (state, transactionId, status) => {
+    if (status === TRANSACTION_STATUSES.UNAPPROVED) {
+      return getUnapprovedTransaction(state, transactionId);
+    }
+    return getTransaction(state, transactionId);
+  },
+  (_state, _transactionId, _status, customTxParamsData) => customTxParamsData,
   (txData, transaction, customTxParamsData) => {
     let fullTxData = { ...txData, ...transaction };
     if (transaction && transaction.simulationFails) {
@@ -829,6 +873,14 @@ export const getFullTxData = createDeepEqualSelector(
 export function getSnaps(state) {
   return state.metamask.snaps;
 }
+
+export const getSnap = createSelector(
+  getSnaps,
+  (_, snapId) => snapId,
+  (snaps, snapId) => {
+    return snaps[snapId];
+  },
+);
 
 export function getInsightSnaps(state) {
   const snaps = Object.values(state.metamask.snaps);
@@ -922,12 +974,14 @@ function getAllowedAnnouncementIds(state) {
     7: false,
     8: supportsWebHid && currentKeyringIsLedger && currentlyUsingLedgerLive,
     9: false,
-    10: true,
-    11: true,
+    10: false,
+    11: false,
     12: false,
     13: false,
     14: false,
-    15: true,
+    15: false,
+    16: true,
+    17: true,
   };
 }
 
@@ -978,6 +1032,10 @@ export function getShowPortfolioTooltip(state) {
   return state.metamask.showPortfolioTooltip;
 }
 
+export function getShowBetaHeader(state) {
+  return state.metamask.showBetaHeader;
+}
+
 /**
  * To get the useTokenDetection flag which determines whether a static or dynamic token list is used
  *
@@ -989,13 +1047,13 @@ export function getUseTokenDetection(state) {
 }
 
 /**
- * To get the useCollectibleDetection flag which determines whether we autodetect NFTs
+ * To get the useNftDetection flag which determines whether we autodetect NFTs
  *
  * @param {*} state
  * @returns Boolean
  */
-export function getUseCollectibleDetection(state) {
-  return Boolean(state.metamask.useCollectibleDetection);
+export function getUseNftDetection(state) {
+  return Boolean(state.metamask.useNftDetection);
 }
 
 /**
@@ -1102,10 +1160,6 @@ export function getAdvancedGasFeeValues(state) {
   return state.metamask.advancedGasFee;
 }
 
-export function getEIP1559V2Enabled(state) {
-  return state.metamask.eip1559V2Enabled;
-}
-
 /**
  *  To check if the user has set advanced gas fee settings as default with a non empty  maxBaseFee and priotityFee.
  *
@@ -1164,7 +1218,9 @@ export function getIsDynamicTokenListAvailable(state) {
  * @returns list of token objects
  */
 export function getDetectedTokensInCurrentNetwork(state) {
-  return state.metamask.detectedTokens;
+  const currentChainId = getCurrentChainId(state);
+  const selectedAddress = getSelectedAddress(state);
+  return state.metamask.allDetectedTokens?.[currentChainId]?.[selectedAddress];
 }
 
 /**
@@ -1219,6 +1275,26 @@ export function getIstokenDetectionInactiveOnNonMainnetSupportedNetwork(state) {
   const isDynamicTokenListAvailable = getIsDynamicTokenListAvailable(state);
 
   return isDynamicTokenListAvailable && !useTokenDetection && !isMainnet;
+}
+
+/**
+ * To get the `improvedTokenAllowanceEnabled` value which determines whether we use the improved token allowance
+ *
+ * @param {*} state
+ * @returns Boolean
+ */
+export function getIsImprovedTokenAllowanceEnabled(state) {
+  return state.metamask.improvedTokenAllowanceEnabled;
+}
+
+/**
+ * To get the `transactionSecurityCheckEnabled` value which determines whether we use the transaction security check
+ *
+ * @param {*} state
+ * @returns Boolean
+ */
+export function getIsTransactionSecurityCheckEnabled(state) {
+  return state.metamask.transactionSecurityCheckEnabled;
 }
 
 export function getIsCustomNetwork(state) {
@@ -1287,4 +1363,8 @@ export function getShouldShowSeedPhraseReminder(state) {
     (parseInt(accountBalance, 16) > 0 || tokens.length > 0) &&
     dismissSeedBackUpReminder === false
   );
+}
+
+export function getCustomTokenAmount(state) {
+  return state.appState.customTokenAmount;
 }
