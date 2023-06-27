@@ -1,3 +1,7 @@
+# Quantum blockchains' modification of the Metamask extension
+
+The purpose of this modification is to include our Quantum Random Number Generator in the process of entropy generation while creating a Metamask wallet. To check it out, please go to 'quantum-blockchains' branch and follow the instructions from README. Our modification is compatible with Metamask version 10.23.0.
+
 # MetaMask Browser Extension
 
 You can find the latest version of MetaMask on [our official website](https://metamask.io/). For help using MetaMask, visit our [User Support Site](https://metamask.zendesk.com/hc/en-us).
